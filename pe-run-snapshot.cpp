@@ -1249,11 +1249,15 @@ static void load_snapshot_file(uc_engine *g_uc, uint8_t *g_guest_space)
 int main(int argc, const char** argv)
 {
     uc_err err;
-    // if(argc < 2)
-    // {
-    //     printf("usage pe-run-snapshot <snapshot path>\n");
-    //     return -1;
-    // }
+    /////////////////////////////////////file//////////////////////////////////////
+    #ifdef MYFILE
+    if(argc < 2)
+    {
+        printf("usage pe-run-snapshot <snapshot path>\n");
+        return -1;
+    }
+    #endif
+    /////////////////////////////////////file//////////////////////////////////////
 
 
 
@@ -1296,14 +1300,23 @@ int main(int argc, const char** argv)
     uc_hook_add(g_uc, &hook2, UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED, 
                 (void*)hook_mem_invalid, NULL, 1, 0);
 
-    ///////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////socket//////////////////////////////////////
+    #ifdef MYSOCKET
     int err_thread;
     pthread_t tid;
     void *tret;
     err_thread = pthread_create(&tid,NULL,pe_recv_buf,NULL);
-
-    // load_snapshot_file(g_uc, g_guest_space);
     load_snapshot_from_socket(g_uc, g_guest_space);
+    #endif
+
+    /////////////////////////////////////socket//////////////////////////////////////
+
+
+    /////////////////////////////////////file//////////////////////////////////////
+    #ifdef MYFILE
+    load_snapshot_file(g_uc, g_guest_space);
+    #endif
+    /////////////////////////////////////file//////////////////////////////////////
 
     // std::cout<<std::hex<< "call uc_emu_start "<< emu_state.eip<<std::endl;
 
@@ -1318,7 +1331,11 @@ int main(int argc, const char** argv)
 
 
     munmap(g_guest_space, g_guest_space_size);
+    /////////////////////////////////////socket//////////////////////////////////////
+    #ifdef MYSOCKET
     pthread_join(tid,&tret);
+    #endif
+    /////////////////////////////////////socket//////////////////////////////////////
 
 
    return 0;

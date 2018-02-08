@@ -5,4 +5,7 @@
 
 void* pe_recv_buf(void* arg);
 void recv_buf_by_length(unsigned char* recv_buf,int length);
+
+//#define MYFILE
+#define MYSOCKET
 #endif
